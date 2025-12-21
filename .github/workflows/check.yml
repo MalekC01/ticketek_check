@@ -1,33 +1,31 @@
-name: Ticketek Monitor
+name: Ticketek Checker
 
+# Run on a schedule (every 5 minutes) and allow manual trigger
 on:
   schedule:
-    - cron: '*/5 * * * *'  # Runs every 5 minutes
-  workflow_dispatch:       # Allows manual trigger
+    - cron: '*/5 * * * *'  # every 5 minutes
+  workflow_dispatch:       # allows manual trigger
 
 jobs:
-  check:
+  check-tickets:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      # Checkout your repo
+      - uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      # Set up Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: '20'
 
+      # Install dependencies
       - name: Install dependencies
         run: |
-          # Initialize npm if package.json doesn't exist
-          if [ ! -f package.json ]; then npm init -y; fi
-          
-          # Install Playwright
-          npm install playwright
-          
-          # Install Chromium for Playwright
+          npm install playwright axios
           npx playwright install chromium
 
-      - name: Run ticket check
+      # Run your Ticketek check
+      - name: Run Ticketek checker
         run: node check_ticketek.js
