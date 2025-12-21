@@ -7,20 +7,22 @@ const webhookUrl = 'https://discord.com/api/webhooks/1452333765543071758/p3ZYRXI
   const browser = await chromium.launch();
   const page = await browser.newPage();
 
+  // Go to the Ticketek search page
   await page.goto(
     'https://marketplace.ticketek.com.au/purchase/searchlist?keyword=Cameron%20winter',
     { waitUntil: 'networkidle' }
   );
 
+  // Wait a few seconds for JS content to load
   await page.waitForTimeout(5000);
 
   const pageText = await page.textContent('body');
 
-  // TEST MODE: always trigger notification
-  if (true) {
+  // Check if tickets are available
+  if (!pageText.includes('None Available')) {
     console.log('🎟️ TICKETS MAY BE AVAILABLE!');
 
-    // Send Discord notification using native fetch
+    // Send Discord notification
     try {
       await fetch(webhookUrl, {
         method: 'POST',
@@ -34,12 +36,11 @@ const webhookUrl = 'https://discord.com/api/webhooks/1452333765543071758/p3ZYRXI
       console.error('Failed to send Discord notification:', err);
     }
 
-    // Wait a second to ensure request completes before exiting
+    // Small delay to ensure request completes
     await new Promise(res => setTimeout(res, 1000));
-
-    process.exit(1); // optional: triggers GitHub email
+  } else {
+    console.log('No tickets yet.');
   }
 
-  console.log('No tickets yet.');
   await browser.close();
 })();
