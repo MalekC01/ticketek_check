@@ -21,7 +21,7 @@ const webhookUrl = 'https://discord.com/api/webhooks/1452333765543071758/p3ZYRXI
   const pageText = await page.textContent('body');
 
   // Check if tickets are available
-  if (!pageText.includes('None Available')) {
+ if (true) { // TEST MODE: always triggers
     console.log('🎟️ TICKETS MAY BE AVAILABLE!');
 
     // Send Discord notification
