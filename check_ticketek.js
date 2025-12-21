@@ -1,22 +1,22 @@
 const { chromium } = require('playwright');
 
-// Your Discord webhook URL
-const webhookUrl = 'https://discord.com/api/webhooks/1452333765543071758/p3ZYRXIGmtFFrtQ9Vk0BJ3uplf3NilBSxw7urcA3xhyJ1pqjRnk6GbqRHqqM3Os8dU6G';
+// Replace with your working Discord webhook URL
+const webhookUrl = 'https://discord.com/api/webhooks/1452337739704959158/tL7M9soUgzt2o3IDarVNZwR_39zTwYFW8RAv5xpDIiRDRHa7s4zkU_Fw_HczFK0iPlhg';
 
 (async () => {
+  console.log('Starting Ticketek check...');
   const browser = await chromium.launch();
   const page = await browser.newPage();
 
-  // Go to the Ticketek search page
   await page.goto(
     'https://marketplace.ticketek.com.au/purchase/searchlist?keyword=Cameron%20winter',
     { waitUntil: 'networkidle' }
   );
 
-  // Wait a few seconds for JS content to load
-  await page.waitForTimeout(5000);
+  await page.waitForTimeout(5000); // wait for JavaScript content to load
 
   const pageText = await page.textContent('body');
+  console.log('Page text length:', pageText.length);
 
   // Check if tickets are available
   if (!pageText.includes('None Available')) {
@@ -24,19 +24,19 @@ const webhookUrl = 'https://discord.com/api/webhooks/1452333765543071758/p3ZYRXI
 
     // Send Discord notification
     try {
-      await fetch(webhookUrl, {
+      const response = await fetch(webhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           content: '🎟️ Cameron Winter tickets may be available! Check here: https://marketplace.ticketek.com.au/purchase/searchlist?keyword=Cameron%20winter'
         })
       });
-      console.log('Discord notification sent.');
+      console.log('Discord response status:', response.status);
     } catch (err) {
       console.error('Failed to send Discord notification:', err);
     }
 
-    // Small delay to ensure request completes
+    // Wait a short moment to ensure request completes
     await new Promise(res => setTimeout(res, 1000));
   } else {
     console.log('No tickets yet.');
